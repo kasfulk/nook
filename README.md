@@ -11,7 +11,7 @@
 
 <p align="center">
   <a href="https://github.com/kasfulk/nook/actions/workflows/ci.yml"><img src="https://github.com/kasfulk/nook/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI"></a>
-  <img src="https://img.shields.io/badge/rust-1.80%2B-orange" alt="Rust 1.80+">
+  <img src="https://img.shields.io/badge/rust-1.95%2B-orange" alt="Rust 1.95+">
   <img src="https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue" alt="MIT OR Apache-2.0">
   <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20Windows-lightgrey" alt="macOS, Linux and Windows">
 </p>
@@ -33,7 +33,7 @@ command, shared by all three surfaces.
 
 ## Quick start
 
-Requires Rust 1.80 or newer (`rustup`). macOS is fully supported; Linux and Windows build from the
+Requires Rust 1.95 or newer (`rustup`). macOS is fully supported; Linux and Windows build from the
 same source and are covered by the CI matrix. `ssh` is needed for tunneled connections, and
 `pg_dump`/`mysqldump` only for those backup types.
 
@@ -92,6 +92,7 @@ printf '%s' "$OPENAI_API_KEY" | nook-cli ai key openai           # the key comes
 A connection is a saved profile name or a URI: `sqlite:./app.db`,
 `postgres://user:pass@127.0.0.1:5432/shop`, `mysql://root@127.0.0.1/shop`.
 Run `nook-cli help` (or `cargo run -p nook-cli -- help`) for the full command list.
+See [`CONTRIBUTING.md`](CONTRIBUTING.md) for setup and how to send a change.
 
 ```sh
 nook-cli mcp    # MCP server on stdio; every command id is a tool
@@ -143,9 +144,9 @@ enforces the layer ordering.
 
 See [`ROADMAP.md`](ROADMAP.md) for status and [`docs/gaps.md`](docs/gaps.md) for the ranked work list.
 
-## Licence
+## License
 
-MIT OR Apache-2.0. Nook is an independent, clean-room project: no Navicat code, resources, icons or
+Dual-licensed under [`LICENSE-MIT`](LICENSE-MIT) and [`LICENSE-APACHE`](LICENSE-APACHE). Nook is an independent, clean-room project: no Navicat code, resources, icons, or
 wording were copied. Navicat is a trademark of PremiumSoft Cybertech Ltd; PostgreSQL, MySQL and SQLite
 belong to their respective owners. Architecture conventions follow the
 [WordCraft](https://github.com/storytold/wordcraft) project as a model.
