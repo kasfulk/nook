@@ -79,7 +79,7 @@ jobs:
             echo "ARCHIVE=${STAGE}.tar.gz" >> $GITHUB_ENV
           fi
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: nook-${{ github.ref_name }}-${{ matrix.target }}
           path: ${{ env.ARCHIVE }}
