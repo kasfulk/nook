@@ -39,7 +39,7 @@ mysql = "28"
 eframe = { version = "0.36", default-features = false, features = ["default_fonts", "glow", "x11", "wayland"] }
 egui = "0.36"
 egui_kittest = { version = "0.36", features = ["snapshot", "wgpu"] }
-rfd = "0.15"
+rfd = "0.17"
 
 [profile.release]
 opt-level = 2
