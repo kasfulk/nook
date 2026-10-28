@@ -14,5 +14,5 @@ postgres = { workspace = true }
 postgres-native-tls = "0.5"
 native-tls = "0.2"
 mysql = { workspace = true, features = ["native-tls"] }
-calamine = "0.36.1"
+calamine = "0.37.0"
 zip = { version = "9.0.4", default-features = false, features = ["deflate"] }
