@@ -1,0 +1,78 @@
+name: Bug report
+description: Report a defect in Nook. For security vulnerabilities, use the Security tab instead.
+title: "[bug] "
+labels: ["bug"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What is wrong? One paragraph.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Exact steps, starting from a clean state if possible. Include the connection URI form (sqlite:./app.db, postgres://…, mysql://…) and any command-line flags.
+      placeholder: |
+        1. Open nook --demo
+        2. Connect to the sample SQLite database
+        3. Open the data grid on table `orders`
+        4. …
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behaviour
+      description: What should have happened.
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behaviour
+      description: What actually happened. Include the exact error message, panic backtrace, or wrong output.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: driver
+    attributes:
+      label: Driver
+      description: Which database driver is involved? Pick all that apply.
+      multiple: true
+      options:
+        - SQLite
+        - PostgreSQL
+        - MySQL / MariaDB
+        - Not driver-specific
+    validations:
+      required: true
+
+  - type: input
+    id: platform
+    attributes:
+      label: Platform / OS
+      description: Operating system and version (e.g. macOS 15.1, Ubuntu 24.04, Windows 11).
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Nook version
+      description: Commit SHA, release tag, or "main as of <date>".
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: Paste relevant log output, backtraces, or screenshots. Redact credentials and connection passwords.
+      render: shell

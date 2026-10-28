@@ -92,7 +92,6 @@ printf '%s' "$OPENAI_API_KEY" | nook-cli ai key openai           # the key comes
 A connection is a saved profile name or a URI: `sqlite:./app.db`,
 `postgres://user:pass@127.0.0.1:5432/shop`, `mysql://root@127.0.0.1/shop`.
 Run `nook-cli help` (or `cargo run -p nook-cli -- help`) for the full command list.
-See [`CONTRIBUTING.md`](CONTRIBUTING.md) for setup and how to send a change.
 
 ```sh
 nook-cli mcp    # MCP server on stdio; every command id is a tool
@@ -122,8 +121,8 @@ generated coverage report, and a test keeps it above a floor that only rises. `c
 
 The rules the codebase is written to — no panics in non-test code, every behaviour a command,
 layering enforced by `cargo xtask layers`, no invented colours — live in
-[`docs/conventions.md`](docs/conventions.md). Contributions are welcome; see
-[the contributor issue](https://github.com/kasfulk/nook/issues/1) for the current onboarding gaps.
+[`docs/conventions.md`](docs/conventions.md). See [`CONTRIBUTING.md`](CONTRIBUTING.md) for setup and
+how to send a change.
 
 ## Architecture
 
@@ -147,7 +146,7 @@ See [`ROADMAP.md`](ROADMAP.md) for status and [`docs/gaps.md`](docs/gaps.md) for
 ## License
 
 Dual-licensed under [`LICENSE-MIT`](LICENSE-MIT) and [`LICENSE-APACHE`](LICENSE-APACHE). Nook is an independent, clean-room project: no Navicat code, resources, icons, or
-wording were copied. Navicat is a trademark of PremiumSoft Cybertech Ltd; PostgreSQL, MySQL and SQLite
+wording were copied. Navicat is a trademark of PremiumSoft Cybertech Ltd; PostgreSQL, MySQL, and SQLite
 belong to their respective owners. Architecture conventions follow the
 [WordCraft](https://github.com/storytold/wordcraft) project as a model.
 

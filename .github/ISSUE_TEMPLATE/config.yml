@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Working conventions
+    url: https://github.com/kasfulk/nook/blob/main/docs/conventions.md
+    about: Read the codebase rules before opening an issue — no-panic, errors-are-Result, hostile-input, command ids, layering.
+  - name: Report a security vulnerability
+    url: https://github.com/kasfulk/nook/security/advisories/new
+    about: Vulnerabilities are reported privately through GitHub Security Advisories, not public issues.

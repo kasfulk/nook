@@ -1,0 +1,101 @@
+# Release workflow
+#
+# To cut a release:
+#   1. Bump `version` in Cargo.toml (workspace.package) and update CHANGELOG.md.
+#   2. Commit, then `git tag vX.Y.Z && git push --tags`.
+#
+# Limitation: no codesign, notarisation, or .app bundling — out of scope for issue #1.
+
+name: release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            target: aarch64-apple-darwin
+          - os: macos-latest
+            target: x86_64-apple-darwin
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: dtolnay/rust-toolchain@1.95
+        with:
+          targets: ${{ matrix.target }}
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: release-${{ matrix.target }}
+
+      # Linux GUI links against libwayland-client and libxkbcommon at build time.
+      # libsecret-tools is a runtime helper for the Linux keychain backend; not needed to build.
+      - name: apt packages (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwayland-dev libxkbcommon-dev pkg-config
+
+      - name: Build
+        run: cargo build --release --target ${{ matrix.target }} -p nook -p nook-cli
+
+      - name: Package
+        shell: bash
+        run: |
+          set -euo pipefail
+          VERSION="${GITHUB_REF_NAME#v}"
+          STAGE="nook-v${VERSION}-${{ matrix.target }}"
+          mkdir -p "$STAGE"
+
+          if [ "${{ runner.os }}" = "Windows" ]; then
+            cp "target/${{ matrix.target }}/release/nook.exe" "$STAGE/"
+            cp "target/${{ matrix.target }}/release/nook-cli.exe" "$STAGE/"
+          else
+            cp "target/${{ matrix.target }}/release/nook" "$STAGE/"
+            cp "target/${{ matrix.target }}/release/nook-cli" "$STAGE/"
+          fi
+
+          cp README.md LICENSE-MIT LICENSE-APACHE "$STAGE/"
+
+          if [ "${{ runner.os }}" = "Windows" ]; then
+            # PowerShell Compress-Archive is reliably present on GH windows runners.
+            powershell -Command "Compress-Archive -Path '$STAGE' -DestinationPath '${STAGE}.zip'"
+            echo "ARCHIVE=${STAGE}.zip" >> $GITHUB_ENV
+          else
+            tar -czf "${STAGE}.tar.gz" "$STAGE"
+            echo "ARCHIVE=${STAGE}.tar.gz" >> $GITHUB_ENV
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nook-${{ github.ref_name }}-${{ matrix.target }}
+          path: ${{ env.ARCHIVE }}
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/*
+          generate_release_notes: true
+          draft: false
+          prerelease: false
