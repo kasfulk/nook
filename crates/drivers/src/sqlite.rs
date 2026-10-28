@@ -195,7 +195,6 @@ impl Driver for Sqlite {
         }
         let declared: Vec<(String, Option<String>)> = stmt
             .columns()
-            .iter()
             .map(|c| (c.name().to_string(), c.decl_type().map(|s| s.to_string())))
             .collect();
         let columns: Vec<String> = declared.iter().map(|(n, _)| n.clone()).collect();
@@ -262,7 +261,6 @@ impl Driver for Sqlite {
         }
         let declared: Vec<(String, Option<String>)> = stmt
             .columns()
-            .iter()
             .map(|c| (c.name().to_string(), c.decl_type().map(|s| s.to_string())))
             .collect();
         let columns: Vec<String> = declared.iter().map(|(n, _)| n.clone()).collect();
@@ -349,7 +347,6 @@ impl Driver for Sqlite {
         }
         let declared: Vec<(String, Option<String>)> = stmt
             .columns()
-            .iter()
             .map(|c| (c.name().to_string(), c.decl_type().map(|s| s.to_string())))
             .collect();
         let columns: Vec<String> = declared.iter().map(|(n, _)| n.clone()).collect();

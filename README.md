@@ -1,13 +1,59 @@
-# Nook
+<p align="center">
+  <img src="docs/screenshots/data-grid.png" alt="Nook showing the customers table in the data grid" width="960">
+</p>
 
-**Database administration for SQLite, PostgreSQL and MySQL — native, fast, and drivable by agents.**
+<h1 align="center">Nook</h1>
 
-A Navicat-style workbench in one Rust codebase: a desktop app (`nook`), a CLI (`nook-cli`), and an MCP
-server for agents. Connections, browsing, data grid, SQL editor, design tools, transfer, sync, backup,
-scheduler, monitor, privileges, reports, ER diagrams, and test-data generation — every action is a
-registered command shared by all three surfaces.
+<p align="center">
+  <strong>Database administration for SQLite, PostgreSQL and MySQL — native, fast, and drivable by agents.</strong><br>
+  A Navicat-style workbench in one Rust codebase: a desktop app, a CLI, and an MCP server.
+</p>
 
-## Features
+<p align="center">
+  <a href="https://github.com/kasfulk/nook/actions/workflows/ci.yml"><img src="https://github.com/kasfulk/nook/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI"></a>
+  <img src="https://img.shields.io/badge/rust-1.95%2B-orange" alt="Rust 1.95+">
+  <img src="https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue" alt="MIT OR Apache-2.0">
+  <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20Windows-lightgrey" alt="macOS, Linux and Windows">
+</p>
+
+Nook is a database workbench that stays out of the way. Open a SQLite file, a PostgreSQL server or a
+MySQL database, browse it, edit rows, write SQL, design tables, move data between engines, back it up,
+schedule the boring parts, and let an agent drive the same commands — without a browser, an account,
+or a cloud round trip.
+
+Connections, browsing, data grid, SQL editor, design tools, transfer, sync, backup, scheduler,
+monitor, privileges, reports, ER diagrams and test-data generation: every action is a registered
+command, shared by all three surfaces.
+
+## A look inside
+
+| Query editor with live results | Server monitor |
+|---|---|
+| ![Query editor](docs/screenshots/query-editor.png) | ![Server monitor](docs/screenshots/monitor.png) |
+
+## Quick start
+
+Requires Rust 1.95 or newer (`rustup`). macOS is fully supported; Linux and Windows build from the
+same source and are covered by the CI matrix. `ssh` is needed for tunneled connections, and
+`pg_dump`/`mysqldump` only for those backup types.
+
+```sh
+git clone https://github.com/kasfulk/nook.git
+cd nook
+./install.sh          # builds the release binaries into ~/.local/bin
+
+nook --demo           # the desktop app, on a sample SQLite database
+nook-cli help         # the same surface from a shell
+```
+
+`PREFIX=/usr/local ./install.sh` installs elsewhere. To build without installing:
+
+```sh
+cargo build --release -p nook -p nook-cli   # binaries land in target/release/
+cargo run -p nook -- --demo
+```
+
+## What you get
 
 | Area | What you get |
 |---|---|
@@ -28,50 +74,9 @@ registered command shared by all three surfaces.
 | **Tools** | Deterministic test-data generation, CSV/JSON import, `.sql` replay, export to CSV/JSON/SQL/Markdown, visual query builder |
 | **Agents** | MCP server over stdio (every command is a tool) and a JSON control channel for the running app |
 
-## Prerequisites
+## Drive it from a shell or an agent
 
-- Rust 1.80 or newer (`rustup`)
-- macOS is fully supported; the GUI uses `egui`/`eframe`
-- Linux and Windows build from the same source, and `.github/workflows/ci.yml` runs the suite on all
-  three. The password store has a backend per platform: `security` on macOS, `secret-tool` on Linux
-  (install `libsecret-tools`), and — since Windows cannot read a `cmdkey` credential back — the
-  profile file with mode 0600 there. The support claim follows a green matrix run; until one exists,
-  macOS remains the supported target
-- `ssh` for tunneled connections; `pg_dump`/`mysqldump` only for those backup types
-
-## Install
-
-```sh
-git clone https://github.com/kasfulk/nook.git && cd nook
-./install.sh
-```
-
-`install.sh` builds the two release binaries and copies them into `~/.local/bin`; set
-`PREFIX=/usr/local ./install.sh` to install elsewhere. It warns if the target directory is not on
-`PATH`.
-
-To build without installing instead:
-
-```sh
-cargo build --release -p nook -p nook-cli   # binaries land in target/release/
-```
-
-## Run
-
-**Desktop app**
-
-```sh
-nook                                       # start with your saved connections
-nook --demo                                # sample SQLite database in the temp directory
-nook --conn postgres://localhost/shop
-nook --sql "select * from users"
-nook --control 7981                        # JSON control channel on port 7981
-nook --shot /tmp/nook.png                  # render one frame to PNG and exit
-```
-
-From a checkout, prefix any of these with `cargo run -p nook --`, e.g. `cargo run -p nook -- --demo`.
-
-**CLI** — the same surface from a shell:
+The desktop app is not the only door. The CLI and the MCP server resolve the same command ids:
 
 ```sh
 nook-cli tables postgres://localhost/shop
@@ -81,27 +86,25 @@ nook-cli transfer --from sqlite:./shop.db --to postgres://localhost/stage --tabl
 nook-cli datagen sqlite:./shop.db customers --rows 500 --seed 7
 nook-cli ai sqlite:./shop.db "revenue per month for @orders"     # prompt to SQL
 nook-cli ai providers                                            # endpoints and whether a key is set
-printf '%s' "$OPENAI_API_KEY" | nook-cli ai key openai            # the key comes from stdin, not argv
+printf '%s' "$OPENAI_API_KEY" | nook-cli ai key openai           # the key comes from stdin, not argv
 ```
 
 A connection is a saved profile name or a URI: `sqlite:./app.db`,
 `postgres://user:pass@127.0.0.1:5432/shop`, `mysql://root@127.0.0.1/shop`.
 Run `nook-cli help` (or `cargo run -p nook-cli -- help`) for the full command list.
 
-**For agents**
-
 ```sh
 nook-cli mcp    # MCP server on stdio; every command id is a tool
 ```
 
-The control channel speaks one JSON object per line; the key is written to
-`<config dir>/control-key.7981` and must be presented on every request:
+The running app can also be driven over a JSON control channel. It listens on `127.0.0.1` and
+requires the key written to `<config dir>/control-key.<port>`:
 
 ```json
 {"id":1,"key":"…","method":"engine.run","params":{"command":"sql.run","params":{"conn":"local","sql":"select 1"}}}
 ```
 
-See [`docs/control-protocol.md`](docs/control-protocol.md).
+See [`docs/control-protocol.md`](docs/control-protocol.md) for every method.
 
 ## Development
 
@@ -116,7 +119,10 @@ the command id that implements it. [`docs/parity-checklist.md`](docs/parity-chec
 generated coverage report, and a test keeps it above a floor that only rises. `cargo xtask parity`
 (or `nook-cli parity` from an install) prints the same numbers, area by area, with the gaps named.
 
-See [`CONTRIBUTING.md`](CONTRIBUTING.md) for setup and how to send a change.
+The rules the codebase is written to — no panics in non-test code, every behaviour a command,
+layering enforced by `cargo xtask layers`, no invented colours — live in
+[`docs/conventions.md`](docs/conventions.md). See [`CONTRIBUTING.md`](CONTRIBUTING.md) for setup and
+how to send a change.
 
 ## Architecture
 
@@ -132,7 +138,7 @@ See [`CONTRIBUTING.md`](CONTRIBUTING.md) for setup and how to send a change.
 | apps | `nook`, `nook-cli` | desktop app, command line |
 
 Every user-visible behaviour is a `CommandSpec` in `crates/engine/src/cmd/*.rs`; the ribbon, menus,
-command palette, CLI, control channel, and MCP tools all resolve the same ids. `cargo xtask layers`
+command palette, CLI, control channel and MCP tools all resolve the same ids. `cargo xtask layers`
 enforces the layer ordering.
 
 See [`ROADMAP.md`](ROADMAP.md) for status and [`docs/gaps.md`](docs/gaps.md) for the ranked work list.
@@ -143,3 +149,5 @@ Dual-licensed under [`LICENSE-MIT`](LICENSE-MIT) and [`LICENSE-APACHE`](LICENSE-
 wording were copied. Navicat is a trademark of PremiumSoft Cybertech Ltd; PostgreSQL, MySQL, and SQLite
 belong to their respective owners. Architecture conventions follow the
 [WordCraft](https://github.com/storytold/wordcraft) project as a model.
+
+See [`ATTRIBUTION.md`](ATTRIBUTION.md) for third-party notices.
