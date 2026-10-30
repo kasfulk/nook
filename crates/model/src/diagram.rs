@@ -225,7 +225,7 @@ impl DiagramDocument {
         let tables = catalog
             .schemas
             .iter()
-            .filter(|s| schema.map_or(true, |want| s.name == want))
+            .filter(|s| schema.is_none_or(|want| s.name == want))
             .flat_map(|s| s.tables.iter().cloned())
             .filter(|t| t.kind == crate::TableKind::Table)
             .collect();

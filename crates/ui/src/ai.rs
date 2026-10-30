@@ -112,7 +112,7 @@ fn collect_ai_context(session: &Session, form: &AiForm) -> Result<AiContext, Str
 
     let key = nook_engine::profiles::ai_key(provider).ok().flatten();
 
-    if provider.needs_key() && key.as_deref().map_or(true, |k| k.trim().is_empty()) {
+    if provider.needs_key() && key.as_deref().is_none_or(|k| k.trim().is_empty()) {
         return Err(format!(
             "no API key for {}; run ai.setKey, or set NOOK_AI_KEY for the run",
             provider.label()

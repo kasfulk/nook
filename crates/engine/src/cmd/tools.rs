@@ -2808,13 +2808,13 @@ fn data_dictionary(session: &mut crate::Session, p: &crate::Params) -> Result<se
         let tables = catalog
             .schemas
             .iter()
-            .filter(|s| schema_filter.as_deref().map_or(true, |want| s.name == want))
+            .filter(|s| schema_filter.as_deref().is_none_or(|want| s.name == want))
             .map(|s| s.tables.len())
             .sum::<usize>();
         let columns = catalog
             .schemas
             .iter()
-            .filter(|s| schema_filter.as_deref().map_or(true, |want| s.name == want))
+            .filter(|s| schema_filter.as_deref().is_none_or(|want| s.name == want))
             .flat_map(|s| &s.tables)
             .map(|t| t.columns.len())
             .sum::<usize>();

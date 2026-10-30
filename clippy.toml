@@ -1,6 +1,6 @@
-# The lint baseline follows the crate's declared `rust-version` (Cargo.toml), so a suggestion that
-# only newer stdlib satisfies is not raised here: `usize::is_multiple_of`, for one, is 1.87.
-msrv = "1.80"
+# The lint baseline follows the crate's declared `rust-version` (Cargo.toml). Raise both together:
+# a suggestion that only a newer stdlib satisfies must not be raised here.
+msrv = "1.95"
 
 # Tests may unwrap: a failing assertion should point at the line, not at error plumbing.
 # Production code is still guarded by the deny list in each crate root.

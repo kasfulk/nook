@@ -7,8 +7,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Added
+- `platform.windows` and `platform.linux` commands report whether the build ships that target and
+  which host it is running on, closing the last two Platform catalog gaps.
 - Release builds now publish `checksums.txt` plus a rendered Homebrew formula (`nook.rb`) and
   Scoop manifest (`nook.json`) as release assets; see `packaging/README.md` for tap/bucket setup.
+
+### Fixed
+- `clippy.toml` now declares the workspace MSRV (1.95) instead of a stale 1.80, so lints are
+  evaluated against the toolchain the project actually builds with.
 
 ## [0.1.0] - 2026-10-28
 

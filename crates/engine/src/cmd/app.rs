@@ -23,6 +23,10 @@ pub fn commands() -> Vec<CommandSpec> {
         CommandSpec::new("app.about", "About Nook", "Help", about),
         CommandSpec::new("app.platform", "Platform information", "Help", platform)
             .help("Build target, UI toolkit and where the configuration lives."),
+        CommandSpec::new("platform.windows", "Windows build", "App", platform_windows)
+            .help("Whether this build ships a Windows binary, and the host it is running on."),
+        CommandSpec::new("platform.linux", "Linux build", "App", platform_linux)
+            .help("Whether this build ships a Linux binary, and the host it is running on."),
         CommandSpec::new("platform.i18n", "Language", "App", i18n)
             .params(r#"{"locale":"id"}"#)
             .help("Report the chrome's languages, or set one. Only the UI's own strings translate; an error the engine raises stays English."),
@@ -289,6 +293,26 @@ fn platform(_session: &mut Session, _p: &crate::Params) -> Result<serde_json::Va
         "keychain": crate::profiles::keychain_available(),
         "version": env!("CARGO_PKG_VERSION"),
     }))
+}
+
+/// The CI matrix builds, lints and tests the Windows and Linux targets on every push, so this build
+/// supports both. The command reports the target it was compiled for as well, because "supported"
+/// and "running here" are different questions.
+fn platform_windows(_session: &mut Session, _p: &crate::Params) -> Result<serde_json::Value> {
+    Ok(platform_support("windows"))
+}
+
+fn platform_linux(_session: &mut Session, _p: &crate::Params) -> Result<serde_json::Value> {
+    Ok(platform_support("linux"))
+}
+
+fn platform_support(platform: &str) -> serde_json::Value {
+    json!({
+        "platform": platform,
+        "supported": true,
+        "host": std::env::consts::OS,
+        "target": format!("{}-{}", std::env::consts::ARCH, std::env::consts::OS),
+    })
 }
 
 /// The chrome's languages, or a switch between them. `locale` is a preference, so it is written to
@@ -587,5 +611,20 @@ mod tests {
         let unknown = set_setting(&mut session, &params(json!({"key": "nope", "value": "1"})))
             .expect_err("unknown key");
         assert!(unknown.to_string().contains("density"), "{unknown}");
+    }
+
+    #[test]
+    fn platform_commands_report_support_and_the_running_host() {
+        let mut session = Session::new();
+        let windows = platform_windows(&mut session, &params(json!({}))).expect("windows");
+        let linux = platform_linux(&mut session, &params(json!({}))).expect("linux");
+
+        assert_eq!(windows["platform"], "windows");
+        assert_eq!(linux["platform"], "linux");
+        assert_eq!(windows["supported"], true);
+        assert_eq!(linux["supported"], true);
+        assert_eq!(windows["host"], std::env::consts::OS);
+        assert!(crate::registry().iter().any(|c| c.id == "platform.windows"));
+        assert!(crate::registry().iter().any(|c| c.id == "platform.linux"));
     }
 }

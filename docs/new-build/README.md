@@ -12,22 +12,21 @@ driven by a script.
 
 ## Baseline, measured
 
-Numbers below are measured in this checkout at `a66bcd2`, not from memory. Re-run the commands before
-starting a phase; a stale baseline is a plan that lies.
+Numbers below are re-measured on `main` at `0de125d` on 2026-10-29, not from memory. Re-run the commands
+before starting a phase; a stale baseline is a plan that lies.
 
 | Fact | Value | Command |
 |---|---|---|
-| Registered commands | 155 | `grep -c 'CommandSpec::new(' crates/engine/src/cmd/*.rs` |
-| Catalog entries | **207** | `cargo xtask parity` (or parse `catalog.rs`; a naive `grep -c '^        "x.y",$'` returns 152 because one-line entries like `("Data", "grid.formView", …)` do not match) |
-| Navicat catalog coverage | 153 / 207 (73.9%) | `cargo xtask parity` |
-| Coverage floor enforced by test | 55.0% | `crates/engine/src/parity.rs::floor_percent` |
-| Tests | 450 | `grep -rn '#\[test\]' --include=*.rs crates apps xtask \| wc -l` |
-| Rust, workspace | ~50,750 lines across 7 crates, 2 apps, xtask | `find crates apps xtask -name '*.rs' \| xargs wc -l \| tail -1` |
+| Registered commands | 238 | `grep -c 'CommandSpec::new(' crates/engine/src/cmd/*.rs` |
+| Catalog entries | **225** | `cargo xtask parity` (or parse `catalog.rs`; a naive `grep -c '^        "x.y",$'` undercounts one-line entries like `("Data", "grid.formView", …)`) |
+| Navicat catalog coverage | 192 / 225 (85.3%) | `cargo xtask parity` |
+| Coverage floor enforced by test | 84.0% | `crates/engine/src/parity.rs::floor_percent` |
+| Tests | 749 | `grep -rn '#\[test\]' --include=*.rs crates apps xtask \| wc -l` |
+| Rust, workspace | ~75,300 lines across 7 crates, 2 apps, xtask | `find crates apps xtask -name '*.rs' \| xargs wc -l \| tail -1` |
 
-Baseline moved while this plan was being written: `origin/main` gained eight commits (trigger, routine and
-sequence editors; the SQLite table rebuild; a splitter that survives `BEGIN IMMEDIATE` and `CASE` inside
-trigger bodies; `schema.setPrimaryKey`). The numbers above are measured **after** rebasing onto `a66bcd2`,
-and phase 7 below is written against what is actually left, not what was missing when the plan started.
+The plan was written against an earlier checkout (`a66bcd2`, 207 catalog entries). Most of its phases have
+since shipped, so the numbers above are the current truth; the phase descriptions remain the record of what
+was planned and why.
 
 > **A note on the catalog count.** `crates/engine/src/catalog.rs` mixes two layouts: most entries are one field
 > per line, a few are collapsed onto a single line (a style change in `b6e1b03`). Any counting script must
@@ -75,9 +74,10 @@ this plan adds (7).
 | [8](phase-8-async-engine.md) | A UI thread that never blocks | `sql.stop`, `sql.profiler`, `sql.planVisualiser`, `monitor.locks`, `monitor.replication`, `monitor.alerts` | 5 | 6 | C |
 | [9](phase-9-metrics-and-platform.md) | Metrics board and platform | `report.designer`, `report.biDashboard`, `report.export`, `monitor.charts`, `priv.roles`, `priv.audit`, `tools.dataProfiling`, `job.agent`, `job.profiles`, `platform.i18n`, `platform.windows`, `platform.linux`, `platform.control`, `platform.cli` | 14 | 8 | C |
 
-**Where the number lands:** 41 of the 54 open catalog ids close → **194 / 207 (93.7%)**. That figure is
-arithmetic over the current catalog, not a measurement; it becomes a fact only when `cargo xtask parity`
-prints it. The 13 that stay open are named below, on purpose.
+**Where the number lands (as planned):** 41 of the 54 open catalog ids close → **194 / 207 (93.7%)**. That
+arithmetic was written against the 207-entry catalog of the time; the catalog has since grown to 225 and
+coverage to 192, so treat it as the plan's intent rather than a current projection. The ids the plan leaves
+open are named below, on purpose.
 
 Arc A is what makes the tool pleasant on a Tuesday. Arc B is what makes it trustworthy with real data.
 Arc C is depth, and it is the only arc that may be cut short: phases 1–6 are the commitment, 7–9 are the

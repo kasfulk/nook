@@ -1,25 +1,25 @@
 # Nook architecture
 
-> **Last reviewed:** 2026-10-14 · **Target:** Navicat Premium 17 workflows
+> **Last reviewed:** 2026-10-29 · **Target:** Navicat Premium 17 workflows
 
 How Nook is built today. The conventions for working in the code are in
 [`conventions.md`](conventions.md).
 
 ## Layers
 
-~44,400 lines of Rust in 7 crates, 2 apps and `xtask` (counted with `wc -l` over every `.rs` under
+~75,300 lines of Rust in 7 crates, 2 apps and `xtask` (counted with `wc -l` over every `.rs` under
 each tree, tests included). `cargo xtask layers` enforces the ordering: a crate may only depend on
 crates below it, and nothing below L5 depends on egui.
 
 | Layer | Crate | Lines | Job |
 |---|---|---|---|
 | L0 | `nook-core` | 1.1k | `Error`/`Result`, `Value` (the one cell type), `ConnectionConfig` with SSH and SSL settings, dialect quoting and literals, `returns_rows` |
-| L1 | `nook-model` | 1.8k | `Catalog`, `Schema`, `Table`, `Column`, `Index`, `ForeignKey`, `DbProcess`, `DbUser`, `ServerInfo`, `ResultSet`; grid edit plans; DDL for all three dialects; structure diff; ER layout |
-| L2 | `nook-ai` | 1.3k | chat client for the 7 providers over two wire formats, endpoint normalisation, API keys, and the `@table` prompt context |
-| L2 | `nook-drivers` | 3.8k | `Driver` trait + `sqlite`, `pg`, `mysql`; statement splitter; data transfer; row-level sync; `.sql` dump; `.xlsx` read (calamine) and write; backup and restore through the vendor tools |
-| L3 | `nook-engine` | 13.2k | `Session` (connections, tabs, grid buffer, history, messages), 154 commands in `cmd/*.rs`, the Navicat feature catalog, parity measurement, jobs and the scheduler, data generation, reports, profiles, the keychain, the app's own SQLite store, the SSH tunnel |
-| L4 | `nook-mcp` | 0.3k | MCP server over stdio: every command is a tool, connections open on demand |
-| L5 | `nook-ui` | 21.3k | egui front end: design tokens, table widget, app shell, sidebar, grid, editor, designer, diagram, charts, monitor, jobs, dialogs, control channel, `--shot` |
+| L1 | `nook-model` | 3.0k | `Catalog`, `Schema`, `Table`, `Column`, `Index`, `ForeignKey`, `DbProcess`, `DbUser`, `ServerInfo`, `ResultSet`; grid edit plans; DDL for all three dialects; structure diff; ER layout |
+| L2 | `nook-ai` | 1.4k | chat client for the 7 providers over two wire formats, endpoint normalisation, API keys, and the `@table` prompt context |
+| L2 | `nook-drivers` | 6.3k | `Driver` trait + `sqlite`, `pg`, `mysql`; statement splitter; data transfer; row-level sync; `.sql` dump; `.xlsx` read (calamine) and write; backup and restore through the vendor tools |
+| L3 | `nook-engine` | 32.9k | `Session` (connections, tabs, grid buffer, history, messages), 238 commands in `cmd/*.rs`, the Navicat feature catalog, parity measurement, jobs and the scheduler, data generation, reports, profiles, the keychain, the app's own SQLite store, the SSH tunnel |
+| L4 | `nook-mcp` | 0.4k | MCP server over stdio: every command is a tool, connections open on demand |
+| L5 | `nook-ui` | 28.5k | egui front end: design tokens, table widget, app shell, sidebar, grid, editor, designer, diagram, charts, monitor, jobs, dialogs, control channel, `--shot` |
 | apps | `nook`, `nook-cli` | 1.6k | desktop binary and the command line |
 
 ## Data flow
@@ -146,7 +146,7 @@ process table. This is the pre-existing path for SSH and database passwords too,
 
 ## Testing
 
-- 433 `#[test]` functions across the workspace, 113 of them in the UI crate: quoting and literals,
+- 749 `#[test]` functions across the workspace, 167 of them in the UI crate: quoting and literals,
   catalog types, DDL per dialect, structure diff, ER layout, statement splitting, edit planning, data
   generation determinism, report shaping, schedules, profiles, MCP JSON-RPC, the AI wire formats and
   prompt building, and every command against junk parameters
