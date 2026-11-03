@@ -1844,7 +1844,7 @@ fn blob_editor(session: &mut Session, p: &Params) -> Result<serde_json::Value> {
     if !compact.is_ascii() {
         return Err(Error::config("hex must be ASCII: only 0-9 and a-f"));
     }
-    if compact.len() % 2 != 0 {
+    if !compact.len().is_multiple_of(2) {
         return Err(Error::config(format!(
             "hex must have an even number of digits, got {}",
             compact.len()

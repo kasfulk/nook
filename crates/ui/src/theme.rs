@@ -657,7 +657,7 @@ fn window(budget: f32, gap: f32, widths: &[f32], note_w: f32, active: Option<usi
     while end + 1 < count && span(0, end + 1) + gap + note_w <= budget {
         end += 1;
     }
-    if active.map_or(true, |active| active <= end) {
+    if active.is_none_or(|active| active <= end) {
         return Fitted {
             start: 0,
             end,
