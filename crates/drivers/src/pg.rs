@@ -418,8 +418,7 @@ fn parse_value(raw: Option<&str>, ty: &Type) -> Value {
 }
 
 fn decode_hex(s: &str) -> Option<Vec<u8>> {
-    // `% 2` rather than the 1.87 `is_multiple_of`: the workspace declares `rust-version = "1.80"`.
-    if s.len() % 2 != 0 {
+    if !s.len().is_multiple_of(2) {
         return None;
     }
     let bytes = s.as_bytes();
