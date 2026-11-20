@@ -138,7 +138,7 @@ fn read_header<R: BufRead>(reader: &mut R, path: &std::path::Path) -> Result<Hea
     })?;
     let mut fields: Vec<Field> = Vec::new();
     let mut width_sum = 1; // the deletion flag
-    for chunk in descriptors.chunks_exact(32) {
+    for chunk in descriptors.as_chunks::<32>().0 {
         if chunk[0] == 0x0D {
             break;
         }
